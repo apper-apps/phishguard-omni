@@ -238,26 +238,49 @@ class CampaignService {
       let totalSent = 0;
       let totalClicked = 0;
       let totalReported = 0;
-allCampaigns.forEach(campaign => {
+// Helper function to create default metrics structure
+      const createDefaultMetrics = () => ({
+        sent: 0,
+        opened: 0,
+        clicked: 0,
+        reported: 0,
+        openRate: 0,
+        clickRate: 0,
+        reportRate: 0
+      });
+
+      // Helper function to validate metrics structure
+      const isValidMetrics = (metrics) => {
+        return metrics && 
+               typeof metrics === 'object' && 
+               typeof metrics.sent === 'number' &&
+               typeof metrics.clicked === 'number' &&
+               typeof metrics.reported === 'number';
+      };
+
+      allCampaigns.forEach(campaign => {
         let metrics = null;
         
         // Handle both string and object formats safely
         if (typeof campaign.metrics === 'string') {
           try {
-            metrics = JSON.parse(campaign.metrics);
+            const parsed = JSON.parse(campaign.metrics);
+            metrics = isValidMetrics(parsed) ? parsed : createDefaultMetrics();
           } catch (error) {
-            console.error('Error parsing campaign metrics JSON:', error);
-            metrics = null;
+            console.error(`Error parsing campaign metrics JSON for campaign ${campaign.Id || 'unknown'}:`, error);
+            console.error(`Problematic metrics data:`, campaign.metrics);
+            metrics = createDefaultMetrics();
           }
         } else if (typeof campaign.metrics === 'object' && campaign.metrics !== null) {
-          metrics = campaign.metrics;
+          metrics = isValidMetrics(campaign.metrics) ? campaign.metrics : createDefaultMetrics();
+        } else {
+          metrics = createDefaultMetrics();
         }
         
-        if (metrics) {
-          totalSent += metrics.sent || 0;
-          totalClicked += metrics.clicked || 0;
-          totalReported += metrics.reported || 0;
-        }
+        // Always use valid metrics (never null)
+        totalSent += metrics.sent || 0;
+        totalClicked += metrics.clicked || 0;
+        totalReported += metrics.reported || 0;
       });
 
       return {
