@@ -1,0 +1,39 @@
+@import 'react-toastify/dist/ReactToastify.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.Toastify__toast {
+  @apply text-sm font-medium rounded-lg shadow-lg;
+}
+
+.Toastify__toast--success {
+  @apply bg-accent text-white;
+}
+
+.Toastify__toast--error {
+  @apply bg-error text-white;
+}
+
+.Toastify__toast--warning {
+  @apply bg-warning text-white;
+}
+
+.Toastify__toast--info {
+  @apply bg-secondary text-white;
+}
+
+.Toastify__toast-container {
+  @apply text-sm;
+  width: 320px;
+}
+
+.Toastify__progress-bar {
+  @apply bg-white bg-opacity-30;
+}

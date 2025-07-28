@@ -1,0 +1,90 @@
+[
+  {
+    "Id": 1,
+    "campaignId": 1,
+    "employeeId": 1,
+    "opened": true,
+    "clicked": false,
+    "reported": true,
+    "timestamp": "2024-01-15T09:30:00Z",
+    "ipAddress": "192.168.1.101",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 2,
+    "campaignId": 1,
+    "employeeId": 2,
+    "opened": true,
+    "clicked": false,
+    "reported": true,
+    "timestamp": "2024-01-15T10:45:00Z",
+    "ipAddress": "192.168.1.102",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  },
+  {
+    "Id": 3,
+    "campaignId": 5,
+    "employeeId": 1,
+    "opened": true,
+    "clicked": true,
+    "reported": false,
+    "timestamp": "2024-01-05T14:15:00Z",
+    "ipAddress": "192.168.1.101",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 4,
+    "campaignId": 5,
+    "employeeId": 3,
+    "opened": true,
+    "clicked": true,
+    "reported": false,
+    "timestamp": "2024-01-05T14:22:00Z",
+    "ipAddress": "192.168.1.103",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 5,
+    "campaignId": 5,
+    "employeeId": 4,
+    "opened": true,
+    "clicked": false,
+    "reported": true,
+    "timestamp": "2024-01-05T14:08:00Z",
+    "ipAddress": "192.168.1.104",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 6,
+    "campaignId": 2,
+    "employeeId": 5,
+    "opened": true,
+    "clicked": false,
+    "reported": true,
+    "timestamp": "2024-01-22T08:15:00Z",
+    "ipAddress": "192.168.1.105",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  },
+  {
+    "Id": 7,
+    "campaignId": 5,
+    "employeeId": 6,
+    "opened": true,
+    "clicked": true,
+    "reported": false,
+    "timestamp": "2024-01-05T14:30:00Z",
+    "ipAddress": "192.168.1.106",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 8,
+    "campaignId": 5,
+    "employeeId": 8,
+    "opened": true,
+    "clicked": false,
+    "reported": true,
+    "timestamp": "2024-01-05T14:12:00Z",
+    "ipAddress": "192.168.1.108",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  }
+]

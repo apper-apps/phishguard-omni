@@ -1,0 +1,90 @@
+[
+  {
+    "Id": 1,
+    "name": "Fake Microsoft Office 365 Login",
+    "category": "Credential Harvesting",
+    "subject": "Your Office 365 account will be suspended",
+    "content": "Your Office 365 account shows suspicious activity. Click here to verify your identity and prevent account suspension.",
+    "difficulty": "easy",
+    "sender": "Microsoft Security Team <security@microsoft-365.com>",
+    "preview": "Action Required: Verify your account within 24 hours to prevent suspension.",
+    "tags": ["Microsoft", "Account Security", "Credential Theft"]
+  },
+  {
+    "Id": 2,
+    "name": "Fake Invoice Attachment",
+    "category": "Malware Delivery",
+    "subject": "Invoice #INV-2024-0892 - Payment Required",
+    "content": "Please find the attached invoice for services rendered. Payment is due within 30 days. Click to download the invoice PDF.",
+    "difficulty": "medium",
+    "sender": "Accounts Receivable <billing@invoiceservices.net>",
+    "preview": "Invoice attached - please review and process payment accordingly.",
+    "tags": ["Invoice", "Finance", "Malware"]
+  },
+  {
+    "Id": 3,
+    "name": "IT Support Credential Request",
+    "category": "Social Engineering",
+    "subject": "Urgent: Network Maintenance - Password Verification Required",
+    "content": "We are performing emergency network maintenance. Please verify your credentials by clicking the link below to avoid service interruption.",
+    "difficulty": "medium",
+    "sender": "IT Support <support@company-it.com>",
+    "preview": "Network maintenance requires immediate credential verification.",
+    "tags": ["IT Support", "Maintenance", "Credentials"]
+  },
+  {
+    "Id": 4,
+    "name": "Fake HR Benefits Update",
+    "category": "Information Gathering",
+    "subject": "Important: Update Your Benefits Information",
+    "content": "Annual benefits enrollment is now open. Please review and update your information by clicking the secure link below.",
+    "difficulty": "easy",
+    "sender": "Human Resources <hr@company.com>",
+    "preview": "Benefits enrollment deadline approaching - update your information now.",
+    "tags": ["HR", "Benefits", "Personal Information"]
+  },
+  {
+    "Id": 5,
+    "name": "CEO Spear Phishing",
+    "category": "Business Email Compromise",
+    "subject": "Urgent: Confidential Acquisition Details",
+    "content": "Please review the attached confidential documents regarding our upcoming acquisition. This information is highly sensitive and time-critical.",
+    "difficulty": "hard",
+    "sender": "CEO Office <ceo@company.com>",
+    "preview": "Confidential acquisition documents require immediate review.",
+    "tags": ["Executive", "Confidential", "Business"]
+  },
+  {
+    "Id": 6,
+    "name": "Fake Bank Security Alert",
+    "category": "Financial Fraud",
+    "subject": "Security Alert: Suspicious Activity Detected",
+    "content": "We have detected unusual activity on your business account. Please verify your identity immediately to prevent account lockout.",
+    "difficulty": "medium",
+    "sender": "Bank Security <security@businessbank.com>",
+    "preview": "Immediate action required to secure your business account.",
+    "tags": ["Banking", "Security", "Financial"]
+  },
+  {
+    "Id": 7,
+    "name": "Software Update Malware",
+    "category": "Malware Delivery",
+    "subject": "Critical Security Update Available",
+    "content": "A critical security update is available for your business software. Download and install immediately to protect against vulnerabilities.",
+    "difficulty": "easy",
+    "sender": "Software Updates <updates@securesoftware.com>",
+    "preview": "Critical security patch available for immediate download.",
+    "tags": ["Software", "Security Update", "Malware"]
+  },
+  {
+    "Id": 8,
+    "name": "Fake Compliance Training",
+    "category": "Social Engineering",
+    "subject": "Mandatory Compliance Training - Complete by Friday",
+    "content": "All employees must complete the attached compliance training module by end of week. Click here to access the training portal.",
+    "difficulty": "easy",
+    "sender": "Compliance Team <compliance@company.com>",
+    "preview": "Mandatory training deadline approaching - complete now to avoid penalties.",
+    "tags": ["Compliance", "Training", "Mandatory"]
+  }
+]

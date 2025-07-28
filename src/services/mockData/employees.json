@@ -1,0 +1,160 @@
+[
+  {
+    "Id": 1,
+    "email": "john.smith@company.com",
+    "name": "John Smith",
+    "department": "Sales",
+    "riskScore": 85,
+    "campaignHistory": [
+      {
+        "campaignId": 1,
+        "opened": true,
+        "clicked": false,
+        "reported": true,
+        "date": "2024-01-15T09:30:00Z"
+      },
+      {
+        "campaignId": 5,
+        "opened": true,
+        "clicked": true,
+        "reported": false,
+        "date": "2024-01-05T14:15:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-15T09:30:00Z",
+    "trainingCompleted": true
+  },
+  {
+    "Id": 2,
+    "email": "sarah.johnson@company.com",
+    "name": "Sarah Johnson",
+    "department": "Marketing",
+    "riskScore": 92,
+    "campaignHistory": [
+      {
+        "campaignId": 1,
+        "opened": true,
+        "clicked": false,
+        "reported": true,
+        "date": "2024-01-15T10:45:00Z"
+      },
+      {
+        "campaignId": 5,
+        "opened": false,
+        "clicked": false,
+        "reported": false,
+        "date": "2024-01-05T14:00:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-15T10:45:00Z",
+    "trainingCompleted": true
+  },
+  {
+    "Id": 3,
+    "email": "mike.chen@company.com",
+    "name": "Mike Chen",
+    "department": "IT",
+    "riskScore": 78,
+    "campaignHistory": [
+      {
+        "campaignId": 5,
+        "opened": true,
+        "clicked": true,
+        "reported": false,
+        "date": "2024-01-05T14:22:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-05T14:22:00Z",
+    "trainingCompleted": false
+  },
+  {
+    "Id": 4,
+    "email": "lisa.wong@company.com",
+    "name": "Lisa Wong",
+    "department": "Finance",
+    "riskScore": 95,
+    "campaignHistory": [
+      {
+        "campaignId": 5,
+        "opened": true,
+        "clicked": false,
+        "reported": true,
+        "date": "2024-01-05T14:08:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-05T14:08:00Z",
+    "trainingCompleted": true
+  },
+  {
+    "Id": 5,
+    "email": "david.rodriguez@company.com",
+    "name": "David Rodriguez",
+    "department": "Executive",
+    "riskScore": 88,
+    "campaignHistory": [
+      {
+        "campaignId": 2,
+        "opened": true,
+        "clicked": false,
+        "reported": true,
+        "date": "2024-01-22T08:15:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-22T08:15:00Z",
+    "trainingCompleted": true
+  },
+  {
+    "Id": 6,
+    "email": "emma.taylor@company.com",
+    "name": "Emma Taylor",
+    "department": "HR",
+    "riskScore": 71,
+    "campaignHistory": [
+      {
+        "campaignId": 5,
+        "opened": true,
+        "clicked": true,
+        "reported": false,
+        "date": "2024-01-05T14:30:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-05T14:30:00Z",
+    "trainingCompleted": false
+  },
+  {
+    "Id": 7,
+    "email": "alex.kumar@company.com",
+    "name": "Alex Kumar",
+    "department": "Engineering",
+    "riskScore": 83,
+    "campaignHistory": [
+      {
+        "campaignId": 5,
+        "opened": false,
+        "clicked": false,
+        "reported": false,
+        "date": "2024-01-05T14:00:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-05T14:00:00Z",
+    "trainingCompleted": true
+  },
+  {
+    "Id": 8,
+    "email": "rachel.brown@company.com",
+    "name": "Rachel Brown",
+    "department": "Accounting",
+    "riskScore": 89,
+    "campaignHistory": [
+      {
+        "campaignId": 5,
+        "opened": true,
+        "clicked": false,
+        "reported": true,
+        "date": "2024-01-05T14:12:00Z"
+      }
+    ],
+    "lastActivity": "2024-01-05T14:12:00Z",
+    "trainingCompleted": true
+  }
+]

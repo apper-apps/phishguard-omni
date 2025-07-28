@@ -1,0 +1,97 @@
+[
+  {
+    "Id": 1,
+    "name": "Q4 Security Awareness Test",
+    "templateId": 1,
+    "status": "completed",
+    "scheduledDate": "2024-01-15T09:00:00Z",
+    "targetGroups": ["Sales", "Marketing"],
+    "metrics": {
+      "sent": 150,
+      "opened": 89,
+      "clicked": 23,
+      "reported": 12,
+      "openRate": 59.3,
+      "clickRate": 15.3,
+      "reportRate": 8.0
+    },
+    "createdDate": "2024-01-10T14:30:00Z",
+    "completedDate": "2024-01-20T16:45:00Z"
+  },
+  {
+    "Id": 2,
+    "name": "Executive Team Spear Phishing",
+    "templateId": 5,
+    "status": "active",
+    "scheduledDate": "2024-01-22T08:00:00Z",
+    "targetGroups": ["Executive"],
+    "metrics": {
+      "sent": 12,
+      "opened": 8,
+      "clicked": 3,
+      "reported": 2,
+      "openRate": 66.7,
+      "clickRate": 25.0,
+      "reportRate": 16.7
+    },
+    "createdDate": "2024-01-18T10:15:00Z",
+    "completedDate": null
+  },
+  {
+    "Id": 3,
+    "name": "IT Department Targeted Test",
+    "templateId": 3,
+    "status": "scheduled",
+    "scheduledDate": "2024-02-01T10:30:00Z",
+    "targetGroups": ["IT", "Engineering"],
+    "metrics": {
+      "sent": 0,
+      "opened": 0,
+      "clicked": 0,
+      "reported": 0,
+      "openRate": 0,
+      "clickRate": 0,
+      "reportRate": 0
+    },
+    "createdDate": "2024-01-25T11:20:00Z",
+    "completedDate": null
+  },
+  {
+    "Id": 4,
+    "name": "Finance Team Invoice Scam",
+    "templateId": 2,
+    "status": "draft",
+    "scheduledDate": null,
+    "targetGroups": ["Finance", "Accounting"],
+    "metrics": {
+      "sent": 0,
+      "opened": 0,
+      "clicked": 0,
+      "reported": 0,
+      "openRate": 0,
+      "clickRate": 0,
+      "reportRate": 0
+    },
+    "createdDate": "2024-01-26T09:45:00Z",
+    "completedDate": null
+  },
+  {
+    "Id": 5,
+    "name": "HR Benefits Update Phish",
+    "templateId": 4,
+    "status": "completed",
+    "scheduledDate": "2024-01-05T14:00:00Z",
+    "targetGroups": ["All Employees"],
+    "metrics": {
+      "sent": 324,
+      "opened": 198,
+      "clicked": 67,
+      "reported": 31,
+      "openRate": 61.1,
+      "clickRate": 20.7,
+      "reportRate": 9.6
+    },
+    "createdDate": "2024-01-02T13:10:00Z",
+    "completedDate": "2024-01-12T17:30:00Z"
+  }
+]
