@@ -2,8 +2,36 @@ import React from "react";
 import ApperIcon from "@/components/ApperIcon";
 import { COMPONENT_TYPES } from "@/components/templateBuilder/ComponentPalette";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
-function TemplatePreview({ components, htmlContent, templateData }) {
-const generateHTMLPreview = () => {
+
+function TemplatePreview({ components, htmlContent, templateData, sampleEmployee }) {
+  // Sample employee data for variable substitution
+  const defaultSampleEmployee = {
+    firstName: "John",
+    lastName: "Smith", 
+    fullName: "John Smith",
+    email: "john.smith@company.com",
+    department: "Sales",
+    company: "Acme Corporation",
+    position: "Sales Manager",
+    phone: "+1 (555) 123-4567"
+  };
+
+  const employeeData = sampleEmployee || defaultSampleEmployee;
+
+  // Function to substitute variables in content
+  const substituteVariables = (content) => {
+    if (!content) return content;
+    
+    let processedContent = content;
+    Object.keys(employeeData).forEach(key => {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      processedContent = processedContent.replace(regex, employeeData[key]);
+    });
+    
+    return processedContent;
+  };
+
+  const generateHTMLPreview = () => {
     let html = `
       <!DOCTYPE html>
       <html>
@@ -24,29 +52,29 @@ const generateHTMLPreview = () => {
         <div class="email-container">
     `;
 
-    // If htmlContent exists and components are empty, use HTML content directly
+// If htmlContent exists and components are empty, use HTML content directly
     if (htmlContent && components.length === 0) {
-      html += htmlContent;
+      html += substituteVariables(htmlContent);
     } else {
       // Render components
       components.forEach(component => {
         html += '<div class="component">';
         
         switch (component.type) {
-          case COMPONENT_TYPES.HEADING:
-            html += `<h${component.props.level} style="text-align: ${component.props.align}; color: ${component.props.color}; margin: 0;">${component.props.text}</h${component.props.level}>`;
+case COMPONENT_TYPES.HEADING:
+            html += `<h${component.props.level} style="text-align: ${component.props.align}; color: ${component.props.color}; margin: 0;">${substituteVariables(component.props.text)}</h${component.props.level}>`;
             break;
             
           case COMPONENT_TYPES.TEXT:
-            html += `<p style="text-align: ${component.props.align}; color: ${component.props.color}; line-height: 1.6; margin: 0;">${component.props.text}</p>`;
+            html += `<p style="text-align: ${component.props.align}; color: ${component.props.color}; line-height: 1.6; margin: 0;">${substituteVariables(component.props.text)}</p>`;
             break;
             
           case COMPONENT_TYPES.IMAGE:
             html += `<div style="text-align: ${component.props.align};"><img src="${component.props.src}" alt="${component.props.alt}" style="width: ${component.props.width}; max-width: 100%; height: auto; border-radius: 4px;"></div>`;
             break;
             
-          case COMPONENT_TYPES.BUTTON:
-            html += `<div style="text-align: ${component.props.align};"><a href="${component.props.url}" class="button" style="background-color: ${component.props.backgroundColor}; color: ${component.props.textColor};">${component.props.text}</a></div>`;
+case COMPONENT_TYPES.BUTTON:
+            html += `<div style="text-align: ${component.props.align};"><a href="${component.props.url}" class="button" style="background-color: ${component.props.backgroundColor}; color: ${component.props.textColor};">${substituteVariables(component.props.text)}</a></div>`;
             break;
             
           case COMPONENT_TYPES.LOGO:
@@ -62,13 +90,13 @@ const generateHTMLPreview = () => {
             break;
             
           case COMPONENT_TYPES.SIGNATURE:
-            html += `
+html += `
               <div class="signature">
-                <p style="margin: 0; font-weight: 600; color: #1a1a1a;">${component.props.name}</p>
-                <p style="margin: 4px 0; color: #666;">${component.props.title}</p>
-                <p style="margin: 4px 0; color: #666;">${component.props.company}</p>
-                <p style="margin: 4px 0; color: #1E40AF;">${component.props.email}</p>
-                <p style="margin: 4px 0; color: #666;">${component.props.phone}</p>
+                <p style="margin: 0; font-weight: 600; color: #1a1a1a;">${substituteVariables(component.props.name)}</p>
+                <p style="margin: 4px 0; color: #666;">${substituteVariables(component.props.title)}</p>
+                <p style="margin: 4px 0; color: #666;">${substituteVariables(component.props.company)}</p>
+                <p style="margin: 4px 0; color: #1E40AF;">${substituteVariables(component.props.email)}</p>
+                <p style="margin: 4px 0; color: #666;">${substituteVariables(component.props.phone)}</p>
               </div>
             `;
             break;
@@ -77,9 +105,9 @@ const generateHTMLPreview = () => {
         html += '</div>';
       });
 
-      // Add HTML content after components if both exist
+// Add HTML content after components if both exist
       if (htmlContent && components.length > 0) {
-        html += `<div class="component">${htmlContent}</div>`;
+        html += `<div class="component">${substituteVariables(htmlContent)}</div>`;
       }
     }
 

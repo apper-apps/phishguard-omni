@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import templateService from '@/services/api/templateService';
+import employeeService from '@/services/api/employeeService';
 import DragDropProvider from '@/components/templateBuilder/DragDropProvider';
 import ComponentPalette from '@/components/templateBuilder/ComponentPalette';
 import TemplateCanvas from '@/components/templateBuilder/TemplateCanvas';
@@ -17,11 +18,11 @@ import ApperIcon from '@/components/ApperIcon';
 function TemplateBuilder() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-const [activeTab, setActiveTab] = useState('builder'); // 'builder', 'wysiwyg', 'html', 'preview'
+  const [activeTab, setActiveTab] = useState('builder'); // 'builder', 'wysiwyg', 'html', 'preview'
   const [cssContent, setCssContent] = useState('');
-  
+  const [sampleEmployee, setSampleEmployee] = useState(null);
   // Template data
   const [templateData, setTemplateData] = useState({
     name: '',
@@ -47,12 +48,35 @@ const [activeTab, setActiveTab] = useState('builder'); // 'builder', 'wysiwyg', 
     'Financial Fraud'
   ];
 
-  // Load existing template if editing
+// Load existing template if editing
   useEffect(() => {
     if (id) {
       loadTemplate();
     }
+    loadSampleEmployee();
   }, [id]);
+
+  const loadSampleEmployee = async () => {
+    try {
+      const employees = await employeeService.getAll();
+      if (employees.length > 0) {
+        const employee = employees[0];
+        const nameParts = employee.name.split(' ');
+        setSampleEmployee({
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          fullName: employee.name,
+          email: employee.email,
+          department: employee.department,
+          company: 'Acme Corporation',
+          position: 'Employee',
+          phone: '+1 (555) 123-4567'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading sample employee:', error);
+    }
+  };
 
   const loadTemplate = async () => {
     try {
@@ -366,7 +390,7 @@ try {
               </div>
             )}
 
-            {activeTab === 'wysiwyg' && (
+{activeTab === 'wysiwyg' && (
               <WYSIWYGEditor
                 content={htmlContent}
                 onChange={setHtmlContent}
@@ -422,12 +446,13 @@ try {
               </div>
             )}
 
-            {activeTab === 'preview' && (
+{activeTab === 'preview' && (
               <TemplatePreview
                 components={components}
                 htmlContent={htmlContent}
                 cssContent={cssContent}
                 templateData={templateData}
+                sampleEmployee={sampleEmployee}
               />
             )}
           </div>

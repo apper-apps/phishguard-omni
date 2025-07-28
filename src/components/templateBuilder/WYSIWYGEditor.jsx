@@ -1,12 +1,13 @@
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import TextAlign from '@tiptap/extension-text-align';
-import Color from '@tiptap/extension-color';
-import TextStyle from '@tiptap/extension-text-style';
-import Underline from '@tiptap/extension-underline';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/Card';
-import Button from '@/components/atoms/Button';
-import ApperIcon from '@/components/ApperIcon';
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import TextAlign from "@tiptap/extension-text-align";
+import Color from "@tiptap/extension-color";
+import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
+import React from "react";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
 
 function WYSIWYGEditor({ content, onChange }) {
 const editor = useEditor({
@@ -126,9 +127,33 @@ const editor = useEditor({
           variant={editor.isActive('orderedList') ? 'primary' : 'outline'}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className="p-2"
-        >
+>
           <ApperIcon name="ListOrdered" size={16} />
         </Button>
+        
+        <div className="w-px h-8 bg-gray-300 mx-2" />
+        <div className="relative">
+          <select
+            onChange={(e) => {
+              if (e.target.value) {
+                editor.chain().focus().insertContent(`{{${e.target.value}}}`).run();
+                e.target.value = '';
+              }
+            }}
+            className="h-8 px-2 text-xs border border-gray-300 rounded bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+            defaultValue=""
+          >
+            <option value="" disabled>Insert Variable</option>
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+            <option value="fullName">Full Name</option>
+            <option value="email">Email</option>
+            <option value="department">Department</option>
+            <option value="company">Company</option>
+            <option value="position">Position</option>
+            <option value="phone">Phone</option>
+          </select>
+        </div>
         
         <div className="w-px h-8 bg-gray-300 mx-2" />
         
@@ -137,12 +162,11 @@ const editor = useEditor({
           className="w-8 h-8 border border-gray-300 rounded cursor-pointer"
           value={editor.getAttributes('textStyle').color || '#000000'}
           onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-          title="Text Color"
+title="Text Color"
         />
       </div>
     );
   };
-
   return (
     <Card className="h-full">
       <CardHeader>
