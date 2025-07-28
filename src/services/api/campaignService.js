@@ -19,13 +19,17 @@ class CampaignService {
     return { ...campaign };
   }
 
-  async create(campaignData) {
+async create(campaignData) {
     await this.delay(400);
     const maxId = Math.max(...this.campaigns.map(c => c.Id), 0);
     const newCampaign = {
       Id: maxId + 1,
       ...campaignData,
-      status: "draft",
+      status: campaignData.status || "draft",
+      customDomain: campaignData.customDomain || "",
+      senderDomain: campaignData.senderDomain || "",
+      landingPageUrl: campaignData.landingPageUrl || "",
+      description: campaignData.description || "",
       createdDate: new Date().toISOString(),
       completedDate: null,
       metrics: {
@@ -42,16 +46,25 @@ class CampaignService {
     return { ...newCampaign };
   }
 
-  async update(id, updates) {
+async update(id, updates) {
     await this.delay(350);
     const index = this.campaigns.findIndex(c => c.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Campaign not found");
     }
-    this.campaigns[index] = { ...this.campaigns[index], ...updates };
-    return { ...this.campaigns[index] };
+    
+    const updatedCampaign = {
+      ...this.campaigns[index],
+      ...updates,
+      customDomain: updates.customDomain ?? this.campaigns[index].customDomain,
+      senderDomain: updates.senderDomain ?? this.campaigns[index].senderDomain,
+      landingPageUrl: updates.landingPageUrl ?? this.campaigns[index].landingPageUrl,
+      description: updates.description ?? this.campaigns[index].description
+    };
+    
+    this.campaigns[index] = updatedCampaign;
+    return { ...updatedCampaign };
   }
-
   async delete(id) {
     await this.delay(250);
     const index = this.campaigns.findIndex(c => c.Id === parseInt(id));
