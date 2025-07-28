@@ -63,15 +63,7 @@
     "status": "draft",
     "scheduledDate": null,
     "targetGroups": ["Finance", "Accounting"],
-    "metrics": {
-      "sent": 0,
-      "opened": 0,
-      "clicked": 0,
-      "reported": 0,
-      "openRate": 0,
-      "clickRate": 0,
-      "reportRate": 0
-    },
+"metrics": "{\"sent\": 0, \"opened\": 0, \"clicked\": 0, \"reported\": 0, \"openRate\": 0, \"clickRate\": 0, \"reportRate\": 0}",
     "createdDate": "2024-01-26T09:45:00Z",
     "completedDate": null
   },
