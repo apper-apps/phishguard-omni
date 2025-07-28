@@ -19,7 +19,7 @@ const Reports = () => {
   const [error, setError] = useState("");
   const [dateRange, setDateRange] = useState("30");
 
-  const loadReportData = async () => {
+const loadReportData = async () => {
     try {
       setLoading(true);
       setError("");
@@ -29,7 +29,23 @@ const Reports = () => {
         employeeService.getAll()
       ]);
       
-      setCampaigns(campaignData);
+      // Parse metrics JSON strings if needed
+      const processedCampaigns = campaignData.map(campaign => {
+        try {
+          const metrics = typeof campaign.metrics === 'string' 
+            ? JSON.parse(campaign.metrics) 
+            : campaign.metrics || { sent: 0, opened: 0, clicked: 0, reported: 0, openRate: 0, clickRate: 0, reportRate: 0 };
+          return { ...campaign, metrics };
+        } catch (parseError) {
+          console.error(`Error parsing metrics for campaign ${campaign.Id}:`, parseError);
+          return { 
+            ...campaign, 
+            metrics: { sent: 0, opened: 0, clicked: 0, reported: 0, openRate: 0, clickRate: 0, reportRate: 0 }
+          };
+        }
+      });
+      
+      setCampaigns(processedCampaigns);
       setEmployees(employeeData);
     } catch (err) {
       setError(err.message || "Failed to load report data");
@@ -136,12 +152,11 @@ const Reports = () => {
     };
   };
 
-  const completedCampaigns = campaigns.filter(c => c.status === "completed");
+const completedCampaigns = campaigns.filter(c => c.status === "completed");
   const averageClickRate = completedCampaigns.length > 0 ? 
-    (completedCampaigns.reduce((sum, c) => sum + parseFloat(c.metrics.clickRate), 0) / completedCampaigns.length).toFixed(1) : 0;
+    (completedCampaigns.reduce((sum, c) => sum + parseFloat(c.metrics?.clickRate || 0), 0) / completedCampaigns.length).toFixed(1) : 0;
   const averageReportRate = completedCampaigns.length > 0 ? 
-    (completedCampaigns.reduce((sum, c) => sum + parseFloat(c.metrics.reportRate), 0) / completedCampaigns.length).toFixed(1) : 0;
-
+    (completedCampaigns.reduce((sum, c) => sum + parseFloat(c.metrics?.reportRate || 0), 0) / completedCampaigns.length).toFixed(1) : 0;
   const exportReport = () => {
     const reportData = {
       generated: new Date().toISOString(),
@@ -352,25 +367,25 @@ const Reports = () => {
                         {campaign.status}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {campaign.metrics.sent}
+<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {campaign.metrics?.sent || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {campaign.metrics.opened} ({campaign.metrics.openRate}%)
+                      {campaign.metrics?.opened || 0} ({campaign.metrics?.openRate || 0}%)
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {campaign.metrics.clicked} ({campaign.metrics.clickRate}%)
+                      {campaign.metrics?.clicked || 0} ({campaign.metrics?.clickRate || 0}%)
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {campaign.metrics.reported} ({campaign.metrics.reportRate}%)
+                      {campaign.metrics?.reported || 0} ({campaign.metrics?.reportRate || 0}%)
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className={cn(
                         "text-sm font-medium",
-                        parseFloat(campaign.metrics.reportRate) >= 10 ? "text-green-600" :
-                        parseFloat(campaign.metrics.reportRate) >= 5 ? "text-yellow-600" : "text-red-600"
+                        parseFloat(campaign.metrics?.reportRate || 0) >= 10 ? "text-green-600" :
+                        parseFloat(campaign.metrics?.reportRate || 0) >= 5 ? "text-yellow-600" : "text-red-600"
                       )}>
-                        {campaign.metrics.reportRate}%
+                        {campaign.metrics?.reportRate || 0}%
                       </div>
                     </td>
                   </tr>

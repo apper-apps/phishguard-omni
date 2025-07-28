@@ -21,13 +21,30 @@ const CampaignList = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const navigate = useNavigate();
 
-  const loadCampaigns = async () => {
+const loadCampaigns = async () => {
     try {
       setLoading(true);
       setError("");
       const data = await campaignService.getAll();
-      setCampaigns(data);
-      setFilteredCampaigns(data);
+      
+      // Parse metrics JSON strings if needed
+      const processedData = data.map(campaign => {
+        try {
+          const metrics = typeof campaign.metrics === 'string' 
+            ? JSON.parse(campaign.metrics) 
+            : campaign.metrics || { sent: 0, opened: 0, clicked: 0, reported: 0, openRate: 0, clickRate: 0, reportRate: 0 };
+          return { ...campaign, metrics };
+        } catch (parseError) {
+          console.error(`Error parsing metrics for campaign ${campaign.Id}:`, parseError);
+          return { 
+            ...campaign, 
+            metrics: { sent: 0, opened: 0, clicked: 0, reported: 0, openRate: 0, clickRate: 0, reportRate: 0 }
+          };
+        }
+      });
+      
+      setCampaigns(processedData);
+      setFilteredCampaigns(processedData);
     } catch (err) {
       setError(err.message || "Failed to load campaigns");
       toast.error("Failed to load campaigns");
@@ -159,23 +176,23 @@ const CampaignList = () => {
                     </div>
                   )}
 
-                  {campaign.metrics.sent > 0 && (
+{campaign.metrics?.sent > 0 && (
                     <div className="grid grid-cols-3 gap-4 pt-3 border-t border-gray-100">
                       <div className="text-center">
-                        <div className={cn("text-lg font-bold", getMetricColor(campaign.metrics.openRate, "openRate"))}>
-                          {campaign.metrics.openRate}%
+                        <div className={cn("text-lg font-bold", getMetricColor(campaign.metrics.openRate || 0, "openRate"))}>
+                          {campaign.metrics.openRate || 0}%
                         </div>
                         <div className="text-xs text-gray-500">Opened</div>
                       </div>
                       <div className="text-center">
-                        <div className={cn("text-lg font-bold", getMetricColor(campaign.metrics.clickRate, "clickRate"))}>
-                          {campaign.metrics.clickRate}%
+                        <div className={cn("text-lg font-bold", getMetricColor(campaign.metrics.clickRate || 0, "clickRate"))}>
+                          {campaign.metrics.clickRate || 0}%
                         </div>
                         <div className="text-xs text-gray-500">Clicked</div>
                       </div>
                       <div className="text-center">
-                        <div className={cn("text-lg font-bold", getMetricColor(campaign.metrics.reportRate, "reportRate"))}>
-                          {campaign.metrics.reportRate}%
+                        <div className={cn("text-lg font-bold", getMetricColor(campaign.metrics.reportRate || 0, "reportRate"))}>
+                          {campaign.metrics.reportRate || 0}%
                         </div>
                         <div className="text-xs text-gray-500">Reported</div>
                       </div>

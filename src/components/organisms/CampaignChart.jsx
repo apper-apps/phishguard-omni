@@ -14,13 +14,30 @@ const CampaignChart = () => {
   const [error, setError] = useState("");
   const [chartType, setChartType] = useState("success_rates");
 
-  const loadCampaigns = async () => {
+const loadCampaigns = async () => {
     try {
       setLoading(true);
       setError("");
       const data = await campaignService.getAll();
+      
+      // Parse metrics JSON strings if needed and filter completed campaigns
+      const processedData = data.map(campaign => {
+        try {
+          const metrics = typeof campaign.metrics === 'string' 
+            ? JSON.parse(campaign.metrics) 
+            : campaign.metrics || { sent: 0, opened: 0, clicked: 0, reported: 0, openRate: 0, clickRate: 0, reportRate: 0 };
+          return { ...campaign, metrics };
+        } catch (parseError) {
+          console.error(`Error parsing metrics for campaign ${campaign.Id}:`, parseError);
+          return { 
+            ...campaign, 
+            metrics: { sent: 0, opened: 0, clicked: 0, reported: 0, openRate: 0, clickRate: 0, reportRate: 0 }
+          };
+        }
+      });
+      
       // Only show completed campaigns with metrics
-      const completedCampaigns = data.filter(c => c.status === "completed" && c.metrics.sent > 0);
+      const completedCampaigns = processedData.filter(c => c.status === "completed" && c.metrics?.sent > 0);
       setCampaigns(completedCampaigns);
     } catch (err) {
       setError(err.message || "Failed to load campaign data");
@@ -99,18 +116,18 @@ const CampaignChart = () => {
             horizontalAlign: "right"
           }
         },
-        series: [
+series: [
           {
             name: "Report Rate",
-            data: campaigns.map(c => parseFloat(c.metrics.reportRate))
+            data: campaigns.map(c => parseFloat(c.metrics?.reportRate || 0))
           },
           {
             name: "Open Rate", 
-            data: campaigns.map(c => parseFloat(c.metrics.openRate))
+            data: campaigns.map(c => parseFloat(c.metrics?.openRate || 0))
           },
           {
             name: "Click Rate",
-            data: campaigns.map(c => parseFloat(c.metrics.clickRate))
+            data: campaigns.map(c => parseFloat(c.metrics?.clickRate || 0))
           }
         ]
       };
@@ -153,18 +170,18 @@ const CampaignChart = () => {
             hover: { size: 8 }
           }
         },
-        series: [
+series: [
           {
             name: "Sent",
-            data: campaigns.map(c => c.metrics.sent)
+            data: campaigns.map(c => c.metrics?.sent || 0)
           },
           {
             name: "Opened",
-            data: campaigns.map(c => c.metrics.opened)
+            data: campaigns.map(c => c.metrics?.opened || 0)
           },
           {
             name: "Clicked",
-            data: campaigns.map(c => c.metrics.clicked)
+            data: campaigns.map(c => c.metrics?.clicked || 0)
           }
         ]
       };
