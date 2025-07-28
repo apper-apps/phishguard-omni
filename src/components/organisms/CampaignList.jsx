@@ -161,10 +161,10 @@ const loadCampaigns = async () => {
                   </div>
                 </div>
 
-                <div className="space-y-3">
+<div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Target Groups:</span>
-                    <span className="font-medium">{campaign.targetGroups.join(", ")}</span>
+                    <span className="font-medium">{campaign.targetGroups?.join(", ") || "N/A"}</span>
                   </div>
                   
                   {campaign.scheduledDate && (
