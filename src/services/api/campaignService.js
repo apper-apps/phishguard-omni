@@ -238,10 +238,20 @@ class CampaignService {
       let totalSent = 0;
       let totalClicked = 0;
       let totalReported = 0;
-
-      allCampaigns.forEach(campaign => {
-        const metrics = typeof campaign.metrics === 'string' ? 
-          JSON.parse(campaign.metrics) : campaign.metrics;
+allCampaigns.forEach(campaign => {
+        let metrics = null;
+        
+        // Handle both string and object formats safely
+        if (typeof campaign.metrics === 'string') {
+          try {
+            metrics = JSON.parse(campaign.metrics);
+          } catch (error) {
+            console.error('Error parsing campaign metrics JSON:', error);
+            metrics = null;
+          }
+        } else if (typeof campaign.metrics === 'object' && campaign.metrics !== null) {
+          metrics = campaign.metrics;
+        }
         
         if (metrics) {
           totalSent += metrics.sent || 0;
