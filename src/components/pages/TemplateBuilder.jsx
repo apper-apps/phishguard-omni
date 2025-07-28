@@ -19,7 +19,8 @@ function TemplateBuilder() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('builder'); // 'builder', 'wysiwyg', 'preview'
+const [activeTab, setActiveTab] = useState('builder'); // 'builder', 'wysiwyg', 'html', 'preview'
+  const [cssContent, setCssContent] = useState('');
   
   // Template data
   const [templateData, setTemplateData] = useState({
@@ -142,8 +143,7 @@ function TemplateBuilder() {
       toast.error('Please enter an email subject');
       return;
     }
-
-    try {
+try {
       setSaving(true);
       
       const saveData = {
@@ -151,6 +151,7 @@ function TemplateBuilder() {
         content: generateContentFromComponents() || htmlContent || templateData.preview,
         structure: components,
         htmlContent: htmlContent,
+        cssContent: cssContent,
         createdDate: new Date().toISOString()
       };
 
@@ -213,10 +214,11 @@ function TemplateBuilder() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
+<div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
           {[
             { key: 'builder', label: 'Visual Builder', icon: 'Layout' },
             { key: 'wysiwyg', label: 'Rich Text', icon: 'Edit3' },
+            { key: 'html', label: 'HTML/CSS', icon: 'Code' },
             { key: 'preview', label: 'Preview', icon: 'Eye' }
           ].map(tab => (
             <button
@@ -348,7 +350,7 @@ function TemplateBuilder() {
 
           {/* Main Content Area */}
           <div className="col-span-9">
-            {activeTab === 'builder' && (
+{activeTab === 'builder' && (
               <div className="grid grid-cols-12 gap-6 h-[calc(100vh-200px)]">
                 <div className="col-span-3">
                   <ComponentPalette />
@@ -371,10 +373,60 @@ function TemplateBuilder() {
               />
             )}
 
+            {activeTab === 'html' && (
+              <div className="grid grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <ApperIcon name="Code" className="mr-2" />
+                      HTML Editor
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <textarea
+                      value={htmlContent}
+                      onChange={(e) => setHtmlContent(e.target.value)}
+                      className="w-full h-80 p-3 border border-gray-300 rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Enter your HTML content here..."
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <ApperIcon name="Palette" className="mr-2" />
+                      CSS Styles
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <textarea
+                      value={cssContent}
+                      onChange={(e) => setCssContent(e.target.value)}
+                      className="w-full h-80 p-3 border border-gray-300 rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="/* Add your custom CSS styles here */
+.email-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.custom-button {
+  background-color: #1E40AF;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+}"
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {activeTab === 'preview' && (
               <TemplatePreview
                 components={components}
                 htmlContent={htmlContent}
+                cssContent={cssContent}
                 templateData={templateData}
               />
             )}

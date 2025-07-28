@@ -3,12 +3,13 @@ import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/Card';
 import Button from '@/components/atoms/Button';
 import ApperIcon from '@/components/ApperIcon';
 
 function WYSIWYGEditor({ content, onChange }) {
-  const editor = useEditor({
+const editor = useEditor({
     extensions: [
       StarterKit,
       TextAlign.configure({
@@ -16,6 +17,7 @@ function WYSIWYGEditor({ content, onChange }) {
       }),
       Color.configure({ types: [TextStyle.name] }),
       TextStyle,
+      Underline,
     ],
     content: content || '<p>Start typing your email content...</p>',
     onUpdate: ({ editor }) => {

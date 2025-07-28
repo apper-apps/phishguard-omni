@@ -27,7 +27,8 @@ async create(templateData) {
       ...templateData,
       createdDate: new Date().toISOString(),
       structure: templateData.structure || null,
-      htmlContent: templateData.htmlContent || templateData.content || ""
+      htmlContent: templateData.htmlContent || templateData.content || "",
+      cssContent: templateData.cssContent || ""
     };
     this.templates.push(newTemplate);
     return { ...newTemplate };
@@ -43,7 +44,8 @@ async update(id, updates) {
       ...this.templates[index], 
       ...updates,
       structure: updates.structure || this.templates[index].structure,
-      htmlContent: updates.htmlContent || updates.content || this.templates[index].htmlContent
+      htmlContent: updates.htmlContent || updates.content || this.templates[index].htmlContent,
+      cssContent: updates.cssContent || this.templates[index].cssContent || ""
     };
     return { ...this.templates[index] };
   }
