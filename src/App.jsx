@@ -6,6 +6,7 @@ import Campaigns from "@/components/pages/Campaigns";
 import CampaignForm from "@/components/pages/CampaignForm";
 import Employees from "@/components/pages/Employees";
 import Templates from "@/components/pages/Templates";
+import TemplateBuilder from "@/components/pages/TemplateBuilder";
 import Reports from "@/components/pages/Reports";
 import Settings from "@/components/pages/Settings";
 function App() {
@@ -18,8 +19,10 @@ function App() {
             <Route path="campaigns" element={<Campaigns />} />
             <Route path="campaigns/new" element={<CampaignForm />} />
             <Route path="campaigns/:id/edit" element={<CampaignForm />} />
-            <Route path="employees" element={<Employees />} />
+<Route path="employees" element={<Employees />} />
             <Route path="templates" element={<Templates />} />
+            <Route path="templates/builder" element={<TemplateBuilder />} />
+            <Route path="templates/builder/:id" element={<TemplateBuilder />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
           </Route>

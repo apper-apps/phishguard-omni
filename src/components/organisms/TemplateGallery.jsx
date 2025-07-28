@@ -79,10 +79,13 @@ const TemplateGallery = () => {
     }
   };
 
-  const handleUseTemplate = (template) => {
+const handleUseTemplate = (template) => {
     navigate("/campaigns/new", { state: { selectedTemplate: template } });
   };
 
+  const handleEditTemplate = (template) => {
+    navigate(`/templates/builder/${template.Id}`);
+  };
   const TemplatePreviewModal = ({ template, onClose }) => {
     if (!template) return null;
 
@@ -252,7 +255,7 @@ const TemplateGallery = () => {
                     </div>
                   )}
 
-                  <div className="flex space-x-2 pt-3">
+<div className="flex space-x-1 pt-3">
                     <Button
                       variant="outline"
                       size="sm"
@@ -262,12 +265,20 @@ const TemplateGallery = () => {
                       Preview
                     </Button>
                     <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleEditTemplate(template)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
                       variant="primary"
                       size="sm"
                       className="flex-1"
                       onClick={() => handleUseTemplate(template)}
                     >
-                      Use Template
+                      Use
                     </Button>
                   </div>
                 </div>

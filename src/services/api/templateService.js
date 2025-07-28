@@ -19,25 +19,32 @@ class TemplateService {
     return { ...template };
   }
 
-  async create(templateData) {
+async create(templateData) {
     await this.delay(300);
     const maxId = Math.max(...this.templates.map(t => t.Id), 0);
     const newTemplate = {
       Id: maxId + 1,
       ...templateData,
-      createdDate: new Date().toISOString()
+      createdDate: new Date().toISOString(),
+      structure: templateData.structure || null,
+      htmlContent: templateData.htmlContent || templateData.content || ""
     };
     this.templates.push(newTemplate);
     return { ...newTemplate };
   }
 
-  async update(id, updates) {
+async update(id, updates) {
     await this.delay(250);
     const index = this.templates.findIndex(t => t.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Template not found");
     }
-    this.templates[index] = { ...this.templates[index], ...updates };
+    this.templates[index] = { 
+      ...this.templates[index], 
+      ...updates,
+      structure: updates.structure || this.templates[index].structure,
+      htmlContent: updates.htmlContent || updates.content || this.templates[index].htmlContent
+    };
     return { ...this.templates[index] };
   }
 

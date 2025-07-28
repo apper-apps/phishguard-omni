@@ -12,12 +12,12 @@ const Templates = () => {
           <h1 className="text-2xl font-bold text-gray-900">Email Templates</h1>
           <p className="text-gray-600 mt-1">Browse and customize phishing email templates for your campaigns</p>
         </div>
-        <Button
+<Button
           variant="primary"
-          onClick={() => navigate("/templates/new")}
+          onClick={() => navigate("/templates/builder")}
           icon="Plus"
         >
-          Create Template
+          Build Template
         </Button>
       </div>
 
