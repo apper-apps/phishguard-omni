@@ -1,110 +1,268 @@
-import campaignsData from "@/services/mockData/campaigns.json";
-
 class CampaignService {
   constructor() {
-    this.campaigns = [...campaignsData];
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'campaign';
+    
+    // Define updateable fields based on Tables & Fields JSON
+    this.updateableFields = [
+      'Name', 'Tags', 'Owner', 'templateId', 'status', 'scheduledDate',
+      'targetGroups', 'metrics', 'createdDate', 'completedDate',
+      'customDomain', 'senderDomain', 'landingPageUrl', 'description'
+    ];
   }
 
   async getAll() {
-    await this.delay(300);
-    return [...this.campaigns];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "templateId" } },
+          { field: { Name: "status" } },
+          { field: { Name: "scheduledDate" } },
+          { field: { Name: "targetGroups" } },
+          { field: { Name: "metrics" } },
+          { field: { Name: "createdDate" } },
+          { field: { Name: "completedDate" } },
+          { field: { Name: "customDomain" } },
+          { field: { Name: "senderDomain" } },
+          { field: { Name: "landingPageUrl" } },
+          { field: { Name: "description" } }
+        ],
+        orderBy: [{ fieldName: "createdDate", sorttype: "DESC" }],
+        pagingInfo: { limit: 1000, offset: 0 }
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching campaigns:", error?.response?.data?.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
   async getById(id) {
-    await this.delay(200);
-    const campaign = this.campaigns.find(c => c.Id === parseInt(id));
-    if (!campaign) {
-      throw new Error("Campaign not found");
-    }
-    return { ...campaign };
-  }
-
-async create(campaignData) {
-    await this.delay(400);
-    const maxId = Math.max(...this.campaigns.map(c => c.Id), 0);
-    const newCampaign = {
-      Id: maxId + 1,
-      ...campaignData,
-      status: campaignData.status || "draft",
-      customDomain: campaignData.customDomain || "",
-      senderDomain: campaignData.senderDomain || "",
-      landingPageUrl: campaignData.landingPageUrl || "",
-      description: campaignData.description || "",
-      createdDate: new Date().toISOString(),
-      completedDate: null,
-      metrics: {
-        sent: 0,
-        opened: 0,
-        clicked: 0,
-        reported: 0,
-        openRate: 0,
-        clickRate: 0,
-        reportRate: 0
+    try {
+      const params = {
+        fields: this.updateableFields.map(field => ({ field: { Name: field } }))
+      };
+      
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
       }
-    };
-    this.campaigns.push(newCampaign);
-    return { ...newCampaign };
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching campaign with ID ${id}:`, error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
-async update(id, updates) {
-    await this.delay(350);
-    const index = this.campaigns.findIndex(c => c.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Campaign not found");
+  async create(campaignData) {
+    try {
+      // Filter to only include updateable fields
+      const filteredData = {};
+      this.updateableFields.forEach(field => {
+        if (campaignData[field] !== undefined) {
+          filteredData[field] = campaignData[field];
+        }
+      });
+
+      // Set defaults for required fields
+      filteredData.status = filteredData.status || "draft";
+      filteredData.createdDate = new Date().toISOString();
+      filteredData.metrics = filteredData.metrics || JSON.stringify({
+        sent: 0, opened: 0, clicked: 0, reported: 0,
+        openRate: 0, clickRate: 0, reportRate: 0
+      });
+
+      const params = {
+        records: [filteredData]
+      };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create campaigns ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        const successfulRecords = response.results.filter(result => result.success);
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating campaign:", error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
     }
-    
-    const updatedCampaign = {
-      ...this.campaigns[index],
-      ...updates,
-      customDomain: updates.customDomain ?? this.campaigns[index].customDomain,
-      senderDomain: updates.senderDomain ?? this.campaigns[index].senderDomain,
-      landingPageUrl: updates.landingPageUrl ?? this.campaigns[index].landingPageUrl,
-      description: updates.description ?? this.campaigns[index].description
-    };
-    
-    this.campaigns[index] = updatedCampaign;
-    return { ...updatedCampaign };
   }
-  async delete(id) {
-    await this.delay(250);
-    const index = this.campaigns.findIndex(c => c.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Campaign not found");
+
+  async update(id, updates) {
+    try {
+      // Filter to only include updateable fields
+      const filteredUpdates = { Id: parseInt(id) };
+      this.updateableFields.forEach(field => {
+        if (updates[field] !== undefined) {
+          filteredUpdates[field] = updates[field];
+        }
+      });
+
+      const params = {
+        records: [filteredUpdates]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to update campaigns ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        const successfulRecords = response.results.filter(result => result.success);
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating campaign:", error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
     }
-    const deleted = this.campaigns.splice(index, 1)[0];
-    return { ...deleted };
+  }
+
+  async delete(id) {
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to delete campaigns ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            if (record.message) throw new Error(record.message);
+          });
+        }
+
+        return response.results.filter(result => result.success).length > 0;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting campaign:", error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
   async launch(id) {
-    await this.delay(500);
-    const campaign = await this.getById(id);
-    if (campaign.status !== "scheduled") {
-      throw new Error("Campaign must be scheduled to launch");
+    try {
+      const campaign = await this.getById(id);
+      if (campaign.status !== "scheduled") {
+        throw new Error("Campaign must be scheduled to launch");
+      }
+      return await this.update(id, { status: "active" });
+    } catch (error) {
+      console.error("Error launching campaign:", error.message);
+      throw error;
     }
-    return await this.update(id, { status: "active" });
   }
 
   async getMetrics() {
-    await this.delay(200);
-    const activeCampaigns = this.campaigns.filter(c => c.status === "active").length;
-    const completedCampaigns = this.campaigns.filter(c => c.status === "completed").length;
-    const totalSent = this.campaigns.reduce((sum, c) => sum + c.metrics.sent, 0);
-    const totalClicked = this.campaigns.reduce((sum, c) => sum + c.metrics.clicked, 0);
-    const totalReported = this.campaigns.reduce((sum, c) => sum + c.metrics.reported, 0);
+    try {
+      const allCampaigns = await this.getAll();
+      
+      const activeCampaigns = allCampaigns.filter(c => c.status === "active").length;
+      const completedCampaigns = allCampaigns.filter(c => c.status === "completed").length;
+      
+      let totalSent = 0;
+      let totalClicked = 0;
+      let totalReported = 0;
 
-    return {
-      activeCampaigns,
-      completedCampaigns,
-      totalSent,
-      totalClicked,
-      totalReported,
-      overallClickRate: totalSent > 0 ? ((totalClicked / totalSent) * 100).toFixed(1) : 0,
-      overallReportRate: totalSent > 0 ? ((totalReported / totalSent) * 100).toFixed(1) : 0
-    };
-  }
+      allCampaigns.forEach(campaign => {
+        const metrics = typeof campaign.metrics === 'string' ? 
+          JSON.parse(campaign.metrics) : campaign.metrics;
+        
+        if (metrics) {
+          totalSent += metrics.sent || 0;
+          totalClicked += metrics.clicked || 0;
+          totalReported += metrics.reported || 0;
+        }
+      });
 
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+      return {
+        activeCampaigns,
+        completedCampaigns,
+        totalSent,
+        totalClicked,
+        totalReported,
+        overallClickRate: totalSent > 0 ? ((totalClicked / totalSent) * 100).toFixed(1) : 0,
+        overallReportRate: totalSent > 0 ? ((totalReported / totalSent) * 100).toFixed(1) : 0
+      };
+    } catch (error) {
+      console.error("Error getting campaign metrics:", error.message);
+      throw error;
+    }
   }
 }
 

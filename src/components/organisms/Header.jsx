@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { cn } from "@/utils/cn";
+import React, { useState } from "react";
+import LogoutButton from "@/components/organisms/LogoutButton";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
+import { cn } from "@/utils/cn";
 
 const Header = ({ title, subtitle, onMenuClick, actions, className }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -100,11 +101,12 @@ const Header = ({ title, subtitle, onMenuClick, actions, className }) => {
             )}
           </div>
 
-          {/* User menu */}
-          <div className="flex items-center">
+{/* User menu */}
+          <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
               <ApperIcon name="User" className="w-4 h-4 text-white" />
             </div>
+            <LogoutButton className="text-gray-600 hover:text-gray-900" />
           </div>
         </div>
       </div>

@@ -1,108 +1,281 @@
-import employeesData from "@/services/mockData/employees.json";
-
 class EmployeeService {
   constructor() {
-    this.employees = [...employeesData];
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'employee';
+    
+    // Define updateable fields based on Tables & Fields JSON
+    this.updateableFields = [
+      'Name', 'Tags', 'Owner', 'email', 'department', 
+      'riskScore', 'campaignHistory', 'lastActivity', 'trainingCompleted'
+    ];
   }
 
   async getAll() {
-    await this.delay(250);
-    return [...this.employees];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "email" } },
+          { field: { Name: "department" } },
+          { field: { Name: "riskScore" } },
+          { field: { Name: "campaignHistory" } },
+          { field: { Name: "lastActivity" } },
+          { field: { Name: "trainingCompleted" } }
+        ],
+        orderBy: [{ fieldName: "Name", sorttype: "ASC" }],
+        pagingInfo: { limit: 1000, offset: 0 }
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching employees:", error?.response?.data?.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
   async getById(id) {
-    await this.delay(200);
-    const employee = this.employees.find(e => e.Id === parseInt(id));
-    if (!employee) {
-      throw new Error("Employee not found");
+    try {
+      const params = {
+        fields: this.updateableFields.map(field => ({ field: { Name: field } }))
+      };
+      
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching employee with ID ${id}:`, error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
     }
-    return { ...employee };
   }
 
   async create(employeeData) {
-    await this.delay(300);
-    const maxId = Math.max(...this.employees.map(e => e.Id), 0);
-    const newEmployee = {
-      Id: maxId + 1,
-      ...employeeData,
-      riskScore: 50,
-      campaignHistory: [],
-      lastActivity: null,
-      trainingCompleted: false
-    };
-    this.employees.push(newEmployee);
-    return { ...newEmployee };
+    try {
+      // Filter to only include updateable fields
+      const filteredData = {};
+      this.updateableFields.forEach(field => {
+        if (employeeData[field] !== undefined) {
+          filteredData[field] = employeeData[field];
+        }
+      });
+
+      const params = {
+        records: [filteredData]
+      };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create employees ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        const successfulRecords = response.results.filter(result => result.success);
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating employee:", error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
   async update(id, updates) {
-    await this.delay(250);
-    const index = this.employees.findIndex(e => e.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Employee not found");
+    try {
+      // Filter to only include updateable fields
+      const filteredUpdates = { Id: parseInt(id) };
+      this.updateableFields.forEach(field => {
+        if (updates[field] !== undefined) {
+          filteredUpdates[field] = updates[field];
+        }
+      });
+
+      const params = {
+        records: [filteredUpdates]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to update employees ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        const successfulRecords = response.results.filter(result => result.success);
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating employee:", error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
     }
-    this.employees[index] = { ...this.employees[index], ...updates };
-    return { ...this.employees[index] };
   }
 
   async delete(id) {
-    await this.delay(200);
-    const index = this.employees.findIndex(e => e.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Employee not found");
-    }
-    const deleted = this.employees.splice(index, 1)[0];
-    return { ...deleted };
-  }
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
 
-  async bulkImport(csvData) {
-    await this.delay(800);
-    // Simulate CSV parsing and validation
-    const importedCount = Math.floor(Math.random() * 50) + 10;
-    return {
-      imported: importedCount,
-      errors: Math.floor(importedCount * 0.1),
-      duplicates: Math.floor(importedCount * 0.05)
-    };
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to delete employees ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            if (record.message) throw new Error(record.message);
+          });
+        }
+
+        return response.results.filter(result => result.success).length > 0;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting employee:", error.response.data.message);
+        throw new Error(error.response.data.message);
+      }
+      throw error;
+    }
   }
 
   async getByDepartment(department) {
-    await this.delay(200);
-    return this.employees.filter(e => e.department === department);
+    try {
+      const params = {
+        fields: this.updateableFields.map(field => ({ field: { Name: field } })),
+        where: [
+          {
+            FieldName: "department",
+            Operator: "EqualTo",
+            Values: [department]
+          }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+      return response.data || [];
+    } catch (error) {
+      console.error("Error fetching employees by department:", error.message);
+      throw error;
+    }
   }
 
   async getRiskStatistics() {
-    await this.delay(200);
-    const lowRisk = this.employees.filter(e => e.riskScore >= 80).length;
-    const mediumRisk = this.employees.filter(e => e.riskScore >= 60 && e.riskScore < 80).length;
-    const highRisk = this.employees.filter(e => e.riskScore < 60).length;
-    const trainingCompleted = this.employees.filter(e => e.trainingCompleted).length;
+    try {
+      const allEmployees = await this.getAll();
+      
+      const lowRisk = allEmployees.filter(e => e.riskScore >= 80).length;
+      const mediumRisk = allEmployees.filter(e => e.riskScore >= 60 && e.riskScore < 80).length;
+      const highRisk = allEmployees.filter(e => e.riskScore < 60).length;
+      const trainingCompleted = allEmployees.filter(e => e.trainingCompleted).length;
 
-    return {
-      total: this.employees.length,
-      lowRisk,
-      mediumRisk,
-      highRisk,
-      trainingCompleted,
-      averageRiskScore: Math.round(this.employees.reduce((sum, e) => sum + e.riskScore, 0) / this.employees.length)
-    };
+      return {
+        total: allEmployees.length,
+        lowRisk,
+        mediumRisk,
+        highRisk,
+        trainingCompleted,
+        averageRiskScore: allEmployees.length > 0 ? 
+          Math.round(allEmployees.reduce((sum, e) => sum + (e.riskScore || 0), 0) / allEmployees.length) : 0
+      };
+    } catch (error) {
+      console.error("Error getting risk statistics:", error.message);
+      throw error;
+    }
   }
 
   async assignTraining(employeeIds, trainingModule) {
-    await this.delay(400);
-    const updated = [];
-    employeeIds.forEach(id => {
-      const index = this.employees.findIndex(e => e.Id === parseInt(id));
-      if (index !== -1) {
-        this.employees[index].trainingAssigned = trainingModule;
-        this.employees[index].trainingAssignedDate = new Date().toISOString();
-        updated.push(this.employees[index]);
-      }
-    });
-    return updated;
+    try {
+      const updatePromises = employeeIds.map(id => 
+        this.update(parseInt(id), {
+          trainingAssigned: trainingModule,
+          trainingAssignedDate: new Date().toISOString()
+        })
+      );
+
+      const results = await Promise.all(updatePromises);
+      return results.filter(result => result !== null);
+    } catch (error) {
+      console.error("Error assigning training:", error.message);
+      throw error;
+    }
   }
 
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  async bulkImport(csvData) {
+    // This would typically parse CSV and create multiple records
+    // For now, return a simulated response
+    return {
+      imported: 0,
+      errors: 0,
+      duplicates: 0
+    };
   }
 }
 
