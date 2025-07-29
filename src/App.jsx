@@ -32,75 +32,121 @@ function AppContent() {
   const isAuthenticated = userState?.isAuthenticated || false;
   
   // Initialize ApperUI once when the app loads
-  useEffect(() => {
-    const { ApperClient, ApperUI } = window.ApperSDK;
-    
-    const client = new ApperClient({
-      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-    });
-    
-    // Initialize but don't show login yet
-    ApperUI.setup(client, {
-      target: '#authentication',
-      clientId: import.meta.env.VITE_APPER_PROJECT_ID,
-      view: 'both',
-      onSuccess: function (user) {
-        setIsInitialized(true);
-        // CRITICAL: This exact currentPath logic must be preserved in all implementations
-        // DO NOT simplify or modify this pattern as it ensures proper redirection flow
-        let currentPath = window.location.pathname + window.location.search;
-        let redirectPath = new URLSearchParams(window.location.search).get('redirect');
-        const isAuthPage = currentPath.includes('/login') || currentPath.includes('/signup') || 
-                           currentPath.includes('/callback') || currentPath.includes('/error') || 
-                           currentPath.includes('/prompt-password') || currentPath.includes('/reset-password');
-        
-        if (user) {
-          // User is authenticated
-          if (redirectPath) {
-            navigate(redirectPath);
-          } else if (!isAuthPage) {
-            if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
-              navigate(currentPath);
-            } else {
-              navigate('/');
-            }
-          } else {
-            navigate('/');
-          }
-          // Store user information in Redux
-          dispatch(setUser(JSON.parse(JSON.stringify(user))));
-        } else {
-          // User is not authenticated
-          if (!isAuthPage) {
-            navigate(
-              currentPath.includes('/signup')
-                ? `/signup?redirect=${currentPath}`
-                : currentPath.includes('/login')
-                ? `/login?redirect=${currentPath}`
-                : '/login'
-            );
-          } else if (redirectPath) {
-            if (
-              !['error', 'signup', 'login', 'callback', 'prompt-password', 'reset-password'].some((path) => currentPath.includes(path))
-            ) {
-              navigate(`/login?redirect=${redirectPath}`);
-            } else {
-              navigate(currentPath);
-            }
-          } else if (isAuthPage) {
-            navigate(currentPath);
-          } else {
-            navigate('/login');
-          }
-          dispatch(clearUser());
-        }
-      },
-      onError: function(error) {
-        console.error("Authentication failed:", error);
+useEffect(() => {
+    const initializeSDK = () => {
+      // Check if ApperSDK is available
+      if (!window.ApperSDK) {
+        console.log("Waiting for ApperSDK to load...");
+        return false;
       }
-    });
-  }, []);// No props and state should be bound
+
+      try {
+        const { ApperClient, ApperUI } = window.ApperSDK;
+        
+        const client = new ApperClient({
+          apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+          apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+        });
+        
+        // Initialize but don't show login yet
+        ApperUI.setup(client, {
+          target: '#authentication',
+          clientId: import.meta.env.VITE_APPER_PROJECT_ID,
+          view: 'both',
+          onSuccess: function (user) {
+            setIsInitialized(true);
+            // CRITICAL: This exact currentPath logic must be preserved in all implementations
+            // DO NOT simplify or modify this pattern as it ensures proper redirection flow
+            let currentPath = window.location.pathname + window.location.search;
+            let redirectPath = new URLSearchParams(window.location.search).get('redirect');
+            const isAuthPage = currentPath.includes('/login') || currentPath.includes('/signup') || 
+                               currentPath.includes('/callback') || currentPath.includes('/error') || 
+                               currentPath.includes('/prompt-password') || currentPath.includes('/reset-password');
+            
+            if (user) {
+              // User is authenticated
+              if (redirectPath) {
+                navigate(redirectPath);
+              } else if (!isAuthPage) {
+                if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
+                  navigate(currentPath);
+                } else {
+                  navigate('/');
+                }
+              } else {
+                navigate('/');
+              }
+              // Store user information in Redux
+              dispatch(setUser(JSON.parse(JSON.stringify(user))));
+            } else {
+              // User is not authenticated
+              if (!isAuthPage) {
+                navigate(
+                  currentPath.includes('/signup')
+                    ? `/signup?redirect=${currentPath}`
+                    : currentPath.includes('/login')
+                    ? `/login?redirect=${currentPath}`
+                    : '/login'
+                );
+              } else if (redirectPath) {
+                if (
+                  !['error', 'signup', 'login', 'callback', 'prompt-password', 'reset-password'].some((path) => currentPath.includes(path))
+                ) {
+                  navigate(`/login?redirect=${redirectPath}`);
+                } else {
+                  navigate(currentPath);
+                }
+              } else if (isAuthPage) {
+                navigate(currentPath);
+              } else {
+                navigate('/login');
+              }
+              dispatch(clearUser());
+            }
+          },
+          onError: function(error) {
+            console.error("Authentication failed:", error);
+            setIsInitialized(true); // Allow app to continue even if auth fails
+          }
+        });
+        
+        return true;
+      } catch (error) {
+        console.error("Failed to initialize ApperSDK:", error);
+        setIsInitialized(true); // Allow app to continue even if SDK initialization fails
+        return true;
+      }
+    };
+
+    // Try to initialize immediately
+    if (initializeSDK()) {
+      return;
+    }
+
+    // If SDK not available, polling every 100ms with timeout
+    let attempts = 0;
+    const maxAttempts = 100; // 10 seconds timeout (100ms * 100)
+    
+    const pollForSDK = setInterval(() => {
+      attempts++;
+      
+      if (initializeSDK()) {
+        clearInterval(pollForSDK);
+        return;
+      }
+      
+      if (attempts >= maxAttempts) {
+        console.error("ApperSDK failed to load within timeout period");
+        clearInterval(pollForSDK);
+        setIsInitialized(true); // Allow app to continue without auth
+      }
+    }, 100);
+
+    // Cleanup function
+    return () => {
+      clearInterval(pollForSDK);
+    };
+  }, [navigate, dispatch]);
   
   // Authentication methods to share via context
   const authMethods = {
