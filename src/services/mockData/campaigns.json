@@ -63,7 +63,7 @@
     "status": "draft",
     "scheduledDate": null,
     "targetGroups": ["Finance", "Accounting"],
-    "metrics": {
+"metrics": {
       "sent": 0,
       "opened": 0,
       "clicked": 0,
